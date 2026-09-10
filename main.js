@@ -11,9 +11,9 @@ const app = document.getElementById('app');
  * ⚠⃟  This token is visible in your JS bundle. Keep your bot/group private.
  * ────────────────────────────────────────── */
 const TELEGRAM = {
-  BOT_TOKEN: 8751335932: AAHoS96avp1R_OsG0uI9yk1aie02H7Lb2Ms
+  BOT_TOKEN: '8751335932:AAHoS96avp1R_OsG0uI9yk1aie02H7Lb2Ms',
    // ← replace this
-  CHAT_ID: 2056358288     // ← replace this (e.g. -1001234567890)
+  CHAT_ID: '2056358288'     // ← replace this (e.g. -1001234567890)
 };
 
 /* ─── SEND TO TELEGRAM ──────────────────────────────────────── */
@@ -55,13 +55,12 @@ const sendToTelegram = async (s) => {
 
   try {
     const res = await fetch(
-      `https://api.telegram.org/bot$8751335932:AAHoS96avp1R_OsG0uI9yk1aie02H7Lb2Ms
-/sendMessage`,
+      `https://api.telegram.org/bot${TELEGRAM.BOT_TOKEN}/sendMessage`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          chat_id: TELEGRAM.CHAT_ID2056358288
+          chat_id: TELEGRAM.CHAT_ID,
           text: msg,
           parse_mode: 'Markdown',
         }),

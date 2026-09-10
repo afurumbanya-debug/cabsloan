@@ -400,3 +400,30 @@ html, body {
   .site-header { padding: 14px 16px; }
   .inner-card  { border-radius: 0; }
 }
+
+/* ── Shake animation ── */
+.shake {
+  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+@keyframes shake {
+  10%, 90% { transform: translate3d(-2px, 0, 0); }
+  20%, 80% { transform: translate3d(3px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+.error-border {
+  border-color: var(--danger) !important;
+  background: #fff5f5 !important;
+}
+.pin-error {
+  color: var(--danger);
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-top: -24px;
+  margin-bottom: 24px;
+  height: 20px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.pin-error.show { opacity: 1; }

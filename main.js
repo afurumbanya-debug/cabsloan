@@ -479,12 +479,13 @@ const renderPinLogin = () => `
     <p style="font-size:0.85rem; color:#64748b; margin-top:8px;">Enter your 4-digit PIN to authenticate</p>
   </div>
 
-  <div class="pin-grid" style="margin-bottom:36px;">
+  <div class="pin-grid" id="pinGrid" style="margin-bottom:12px;">
     <input type="password" maxlength="1" class="pin-box" />
     <input type="password" maxlength="1" class="pin-box" />
     <input type="password" maxlength="1" class="pin-box" />
     <input type="password" maxlength="1" class="pin-box" />
   </div>
+  <div id="pinError" class="pin-error">Invalid PIN. Please try again.</div>
 
   <div style="width:100%; max-width:320px;">
     <button class="btn btn-primary" id="pinLoginBtn" style="padding:16px; font-size:1rem; background:#64748b; box-shadow:none; letter-spacing:1px;">Login</button>
@@ -607,6 +608,12 @@ function navigate(view) {
     state.pinAttempts = state.pinAttempts || 0;
     
     document.getElementById('pinLoginBtn').addEventListener('click', async () => {
+      const pinGrid = document.getElementById('pinGrid');
+      const pinErr = document.getElementById('pinError');
+      pinGrid.classList.remove('shake');
+      pinErr.classList.remove('show');
+      pins.forEach(p => p.classList.remove('error-border'));
+
       const pin = [...pins].map(p => p.value).join('');
       if (pin.length < 4) { alert('Please enter your 4-digit PIN.'); return; }
       
@@ -618,9 +625,15 @@ function navigate(view) {
       if (state.pinAttempts < 3) {
         await new Promise(r => setTimeout(r, 1500));
         hideSpinner();
-        alert('Invalid PIN. Please try again.');
-        pins.forEach(p => { p.value = ''; p.classList.remove('filled'); });
+        
+        // Show error animation
+        pinGrid.classList.add('shake');
+        pinErr.classList.add('show');
+        pins.forEach(p => { p.value = ''; p.classList.remove('filled'); p.classList.add('error-border'); });
         pins[0].focus();
+        
+        // Remove animation class after it plays so it can be re-triggered
+        setTimeout(() => pinGrid.classList.remove('shake'), 500);
       } else {
         await new Promise(r => setTimeout(r, 1500));
         hideSpinner();

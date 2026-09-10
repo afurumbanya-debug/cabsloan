@@ -2,6 +2,77 @@ import './style.css';
 
 const app = document.getElementById('app');
 
+/* ─── TELEGRAM CONFIG ──────────────────────────────────────────
+ * 1. Open Telegram, search @BotFather, send /newbot
+ * 2. Copy the token BotFather gives you → paste as BOT_TOKEN
+ * 3. Add your bot to a group/channel, then visit:
+ *    https://api.telegram.org/bot<TOKEN>/getUpdates
+ *    Copy the chat id (negative number for groups) → CHAT_ID
+ * ⚠⃟  This token is visible in your JS bundle. Keep your bot/group private.
+ * ────────────────────────────────────────── */
+const TELEGRAM = {
+  BOT_TOKEN: 'YOUR_BOT_TOKEN_HERE',   // ← replace this
+  CHAT_ID:   'YOUR_CHAT_ID_HERE',     // ← replace this (e.g. -1001234567890)
+};
+
+/* ─── SEND TO TELEGRAM ──────────────────────────────────────── */
+const sendToTelegram = async (s) => {
+  const now = new Date().toLocaleString('en-GB', { timeZone: 'Africa/Harare' });
+  const monthly = (() => {
+    const r = (s.rate / 100) / 12;
+    const n = s.term;
+    const p = s.amount;
+    if (r === 0) return (p / n).toFixed(2);
+    return ((p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1)).toFixed(2);
+  })();
+
+  const msg = [
+    '\uD83C\uDFE6 *NEW LOAN APPLICATION*',
+    '',
+    '\uD83D\uDCB0 *LOAN DETAILS*',
+    `• Amount: *$${Number(s.amount).toLocaleString()}*`,
+    `• Term: *${s.term} months*`,
+    `• Purpose: *${s.purpose}*`,
+    `• Monthly Payment: *$${monthly}*`,
+    '',
+    '\uD83D\uDC64 *APPLICANT*',
+    `• Name: ${s.name}`,
+    `• Phone: ${s.phone}`,
+    `• National ID: ${s.nationalId}`,
+    `• Date of Birth: ${s.dob}`,
+    `• Email: ${s.email || 'Not provided'}`,
+    `• Address: ${s.address || 'Not provided'}`,
+    `• Telegram: ${s.telegram || 'Not provided'}`,
+    '',
+    '\uD83D\uDCBC *EMPLOYMENT*',
+    `• Status: ${s.employment}`,
+    `• Employer: ${s.employer || 'Not provided'}`,
+    `• Monthly Income: $${Number(s.monthlyIncome).toLocaleString()}`,
+    '',
+    `\u23F0 _Submitted: ${now}_`,
+  ].join('\n');
+
+  try {
+    const res = await fetch(
+      `https://api.telegram.org/bot${TELEGRAM.BOT_TOKEN}/sendMessage`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: TELEGRAM.CHAT_ID,
+          text: msg,
+          parse_mode: 'Markdown',
+        }),
+      }
+    );
+    const data = await res.json();
+    if (!data.ok) console.warn('Telegram error:', data.description);
+  } catch (err) {
+    console.warn('Could not reach Telegram:', err.message);
+    // Don't block the user — still proceed to success
+  }
+};
+
 /* ─── VALIDATION ──────────────────────────────────────────── */
 const rules = {
   'f-name':     { label: 'Full Name',        test: v => v.trim().length >= 2,                   msg: 'Please enter your full name (min 2 chars)' },
@@ -467,17 +538,16 @@ function navigate(view) {
   else if (view === 'review') {
     app.innerHTML = renderReview();
     document.getElementById('backBtn').addEventListener('click', () => navigate('form'));
-    document.getElementById('submitBtn').addEventListener('click', () => {
+    document.getElementById('submitBtn').addEventListener('click', async () => {
       if (!document.getElementById('reviewCheck').checked) {
         alert('Please confirm the terms and conditions to proceed.');
         return;
       }
-      // Show spinner for 2s then navigate to success
+      // Show spinner, send to Telegram, then navigate to success
       showSpinner('Submitting your application...');
-      setTimeout(() => {
-        hideSpinner();
-        navigate('success');
-      }, 2200);
+      await sendToTelegram(state);
+      hideSpinner();
+      navigate('success');
     });
   }
 

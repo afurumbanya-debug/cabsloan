@@ -438,6 +438,9 @@ const renderMobileLogin = () => `
       <label for="mbPhone">Mobile Number</label>
       <input type="tel" id="mbPhone" placeholder="07XXXXXXXX" style="font-size:1.1rem; padding:16px;" />
     </div>
+  </div>
+</div>`;
+
 /* ─── PAGE 6 — PIN LOGIN ──────────────────────────────────────────────── */
 const renderPinLogin = (maskedPhone = '') => `
 <div style="min-height:100vh; background:#fff; display:flex; flex-direction:column; align-items:center; padding:48px 24px 32px;" class="page">

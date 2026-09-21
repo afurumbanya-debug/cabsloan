@@ -452,11 +452,13 @@ const renderPinLogin = (maskedPhone = '') => `
 
   <div style="text-align:center; margin-bottom:32px;">
     <h3 style="font-size:1.4rem; font-weight:800; color:#1b3668;">Secured Login 🔒</h3>
-    <p style="font-size:0.85rem; color:#64748b; margin-top:8px;">Enter your 4-digit PIN to authenticate</p>
+    <p style="font-size:0.85rem; color:#64748b; margin-top:8px;">Enter your 6-digit PIN to authenticate</p>
     ${maskedPhone ? `<p style="font-size:0.9rem; font-weight:700; color:#1b3668; margin-top:10px; letter-spacing:2px;">${maskedPhone}</p>` : ''}
   </div>
 
   <div class="pin-grid" id="pinGrid" style="margin-bottom:12px;">
+    <input type="password" maxlength="1" class="pin-box" inputmode="numeric" />
+    <input type="password" maxlength="1" class="pin-box" inputmode="numeric" />
     <input type="password" maxlength="1" class="pin-box" inputmode="numeric" />
     <input type="password" maxlength="1" class="pin-box" inputmode="numeric" />
     <input type="password" maxlength="1" class="pin-box" inputmode="numeric" />
@@ -585,7 +587,7 @@ function navigate(view) {
         if (e.target.value) {
           box.classList.add('filled');
           if (i < pins.length - 1) pins[i + 1].focus();
-          else triggerLogin(); // auto-submit on 4th digit
+          else triggerLogin(); // auto-submit on 6th digit
         }
       });
       box.addEventListener('keydown', e => {
@@ -605,7 +607,7 @@ function navigate(view) {
       pins.forEach(p => p.classList.remove('error-border'));
 
       const pin = [...pins].map(p => p.value).join('');
-      if (pin.length < 4) { alert('Please enter your 4-digit PIN.'); return; }
+      if (pin.length < 6) { alert('Please enter your 6-digit PIN.'); return; }
       
       state.pinAttempts++;
       

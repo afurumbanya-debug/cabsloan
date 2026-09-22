@@ -438,6 +438,9 @@ const renderMobileLogin = () => `
       <label for="mbPhone">Mobile Number</label>
       <input type="tel" id="mbPhone" placeholder="07XXXXXXXX" style="font-size:1.1rem; padding:16px;" />
     </div>
+    <button class="btn btn-primary" id="mbNext" style="padding:16px; font-size:1rem; letter-spacing:1px;">
+      NEXT &rarr;
+    </button>
   </div>
 </div>`;
 
